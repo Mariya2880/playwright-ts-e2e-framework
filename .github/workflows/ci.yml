@@ -24,8 +24,8 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
 
-  smoke:
-    name: Smoke tests
+  e2e:
+    name: E2E tests
     needs: static-checks
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -51,12 +51,13 @@ jobs:
         if: steps.pw-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
 
-      - run: npm run test:smoke
+      # Small suite: run everything on each PR. Split into @smoke (PR) / @regression (nightly) once it grows.
+      - run: npm test
 
       - name: Upload HTML report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-smoke
+          name: playwright-report
           path: playwright-report/
           retention-days: 14

@@ -16,6 +16,8 @@ export default tseslint.config(
       'playwright/no-focused-test': 'error',
       'playwright/no-force-option': 'error',
       'playwright/prefer-web-first-assertions': 'error',
+      // Page-object helpers that wrap expect() count as assertions.
+      'playwright/expect-expect': ['warn', { assertFunctionPatterns: ['^expect[A-Z]'] }],
     },
   },
 );
