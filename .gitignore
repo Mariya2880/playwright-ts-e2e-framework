@@ -1,0 +1,15 @@
+node_modules/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Saved login sessions: never commit auth state
+.auth/
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+.DS_Store
