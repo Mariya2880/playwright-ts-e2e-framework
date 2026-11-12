@@ -1,10 +1,12 @@
 import { test as base } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
+import { ProductDetailsPage } from '../pages/ProductDetailsPage';
 
 type Pages = {
   loginPage: LoginPage;
   inventoryPage: InventoryPage;
+  productDetailsPage: ProductDetailsPage;
 };
 
 /**
@@ -17,6 +19,9 @@ export const test = base.extend<Pages>({
   },
   inventoryPage: async ({ page }, use) => {
     await use(new InventoryPage(page));
+  },
+  productDetailsPage: async ({ page }, use) => {
+    await use(new ProductDetailsPage(page));
   },
 });
 
