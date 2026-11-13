@@ -19,8 +19,14 @@ export class ProductDetailsPage {
     this.backButton = page.getByTestId('back-to-products');
   }
 
+  /**
+   * Sauce Demo is a single-page app: the URL changes before the list is replaced by the details view.
+   * Waiting for an element that only exists on the details page (the Back button) makes this race-free,
+   * so every locator below is unambiguous afterwards.
+   */
   async expectLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/inventory-item\.html\?id=\d+$/);
-    await expect(this.name).toBeVisible();
+    await expect(this.backButton).toBeVisible();
+    await expect(this.name).toHaveCount(1);
   }
 }

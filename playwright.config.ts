@@ -29,7 +29,17 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testDir: './tests/ui',
       use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      // API tests need no browser: they run on Playwright's request context only.
+      name: 'api',
+      testDir: './tests/api',
+      use: {
+        baseURL: env.apiBaseUrl,
+        extraHTTPHeaders: { Accept: 'application/json' },
+      },
     },
   ],
 });
