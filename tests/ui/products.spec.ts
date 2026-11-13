@@ -107,6 +107,9 @@ test.describe('Product details page', { tag: '@regression' }, () => {
     productDetailsPage,
   }) => {
     await inventoryPage.openProduct(BIKE_LIGHT);
+    // Wait for the navigation to finish: until then the list page's 6 "Add to cart" buttons are still in the DOM.
+    await productDetailsPage.expectLoaded();
+    await expect(productDetailsPage.name).toHaveText(BIKE_LIGHT);
     await productDetailsPage.addToCartButton.click();
 
     await expect(productDetailsPage.removeButton).toBeVisible();
