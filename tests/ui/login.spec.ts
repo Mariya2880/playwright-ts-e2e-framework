@@ -3,6 +3,9 @@ import { env } from '../../config/env';
 import { users } from '../../utils/users';
 
 test.describe('Login', () => {
+  // Login tests must start without a session.
+  test.use({ storageState: { cookies: [], origins: [] } });
+
   test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto();
   });

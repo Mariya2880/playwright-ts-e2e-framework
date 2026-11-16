@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Framework smoke check', { tag: '@smoke' }, () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
   test('login page loads with all form controls', async ({ page }) => {
     await page.goto('/');
 

@@ -24,14 +24,22 @@ export class CheckoutInfoPage {
     await expect(this.page).toHaveURL(/\/checkout-step-one\.html$/);
   }
 
+<<<<<<< Updated upstream
   async fill(customer: CustomerInfo): Promise<void> {
+=======
+  async enterDetails(customer: CustomerInfo): Promise<void> {
+>>>>>>> Stashed changes
     await this.firstName.fill(customer.firstName);
     await this.lastName.fill(customer.lastName);
     await this.postalCode.fill(customer.postalCode);
   }
 
   async submit(customer: CustomerInfo): Promise<void> {
+<<<<<<< Updated upstream
     await this.fill(customer);
+=======
+    await this.enterDetails(customer);
+>>>>>>> Stashed changes
     await this.continueButton.click();
   }
 

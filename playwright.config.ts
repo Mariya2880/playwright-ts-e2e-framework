@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import { env } from './config/env';
+import { STORAGE_STATE } from './tests/auth.setup.paths';
 
 const isCI = !!process.env.CI;
 
@@ -28,9 +29,16 @@ export default defineConfig({
 
   projects: [
     {
+      // Logs in once and saves the session; UI tests reuse it instead of logging in every time.
+      name: 'setup',
+      testDir: './tests',
+      testMatch: /auth\.setup\.ts/,
+    },
+    {
       name: 'chromium',
       testDir: './tests/ui',
-      use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
+      use: { ...devices['Desktop Chrome'], storageState: STORAGE_STATE },
     },
     {
       // API tests need no browser: they run on Playwright's request context only.
