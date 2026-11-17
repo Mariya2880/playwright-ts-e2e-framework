@@ -40,6 +40,23 @@ export default defineConfig({
       dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'], storageState: STORAGE_STATE },
     },
+    // Cross-browser runs are opt-in (nightly in CI) to keep PR feedback fast.
+    ...(process.env.CROSS_BROWSER
+      ? [
+          {
+            name: 'firefox',
+            testDir: './tests/ui',
+            dependencies: ['setup'],
+            use: { ...devices['Desktop Firefox'], storageState: STORAGE_STATE },
+          },
+          {
+            name: 'webkit',
+            testDir: './tests/ui',
+            dependencies: ['setup'],
+            use: { ...devices['Desktop Safari'], storageState: STORAGE_STATE },
+          },
+        ]
+      : []),
     {
       // API tests need no browser: they run on Playwright's request context only.
       name: 'api',
