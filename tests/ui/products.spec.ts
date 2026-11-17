@@ -1,13 +1,14 @@
 import { test, expect } from '../../fixtures/test';
-import { loginAs } from '../../utils/session';
 
 const BACKPACK = 'Sauce Labs Backpack';
 const BIKE_LIGHT = 'Sauce Labs Bike Light';
 const ONESIE = 'Sauce Labs Onesie';
 
 test.describe('Products page', () => {
-  test.beforeEach(async ({ loginPage, inventoryPage }) => {
-    await loginAs(loginPage, inventoryPage);
+  test.beforeEach(async ({ inventoryPage }) => {
+    // Already authenticated via the storageState created in auth.setup.ts.
+    await inventoryPage.goto();
+    await inventoryPage.expectLoaded();
   });
 
   test('lists 6 products, each with a name, price and image', { tag: '@smoke' }, async ({
@@ -81,8 +82,10 @@ test.describe('Products page', () => {
 });
 
 test.describe('Product details page', { tag: '@regression' }, () => {
-  test.beforeEach(async ({ loginPage, inventoryPage }) => {
-    await loginAs(loginPage, inventoryPage);
+  test.beforeEach(async ({ inventoryPage }) => {
+    // Already authenticated via the storageState created in auth.setup.ts.
+    await inventoryPage.goto();
+    await inventoryPage.expectLoaded();
   });
 
   test('shows the same name and price as the product clicked in the list', async ({

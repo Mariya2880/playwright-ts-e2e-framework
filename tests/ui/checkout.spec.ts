@@ -10,8 +10,8 @@ const ONESIE = 'Sauce Labs Onesie';
 const TAX_RATE = 0.08;
 
 test.describe('Checkout', () => {
-  test.beforeEach(async ({ loginPage, inventoryPage, cartPage }) => {
-    await loginAs(loginPage, inventoryPage);
+  test.beforeEach(async ({ inventoryPage, cartPage }) => {
+    await inventoryPage.goto();
     await inventoryPage.addToCart(BACKPACK);
     await cartPage.goto();
     await cartPage.checkoutButton.click();
@@ -58,6 +58,9 @@ test.describe('Checkout', () => {
 });
 
 test.describe('End-to-end purchase', () => {
+  // The full journey deliberately starts logged out, like a real customer.
+  test.use({ storageState: { cookies: [], origins: [] } });
+
   test('a customer can buy several items with correct totals', { tag: ['@smoke', '@e2e'] }, async ({
     loginPage,
     inventoryPage,

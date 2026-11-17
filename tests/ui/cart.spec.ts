@@ -1,12 +1,13 @@
 import { test, expect } from '../../fixtures/test';
-import { loginAs } from '../../utils/session';
 
 const BACKPACK = 'Sauce Labs Backpack';
 const FLEECE = 'Sauce Labs Fleece Jacket';
 
 test.describe('Cart', { tag: '@regression' }, () => {
-  test.beforeEach(async ({ loginPage, inventoryPage }) => {
-    await loginAs(loginPage, inventoryPage);
+  test.beforeEach(async ({ inventoryPage }) => {
+    // Already authenticated via the storageState created in auth.setup.ts.
+    await inventoryPage.goto();
+    await inventoryPage.expectLoaded();
   });
 
   test('shows exactly the items added, with matching prices and quantity 1', async ({
