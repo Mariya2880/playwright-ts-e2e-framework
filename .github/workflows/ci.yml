@@ -4,10 +4,13 @@ on:
   pull_request:
   push:
     branches: [main]
+  schedule:
+    # Nightly at 03:00 UTC: full regression on Chromium, Firefox and WebKit.
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
@@ -42,7 +45,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright browsers
         if: steps.pw-cache.outputs.cache-hit != 'true'
@@ -51,7 +54,7 @@ jobs:
         if: steps.pw-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
 
-      # Small suite: run everything on each PR. Split into @smoke (PR) / @regression (nightly) once it grows.
+      # Chromium UI + API on every PR and push: fast feedback (~1 min).
       - run: npm test
 
       - name: Upload HTML report
@@ -59,5 +62,30 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+  cross-browser:
+    name: Cross-browser regression
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: static-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CROSS_BROWSER: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npx playwright test --project=firefox --project=webkit
+      - name: Upload HTML report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-cross-browser
           path: playwright-report/
           retention-days: 14
