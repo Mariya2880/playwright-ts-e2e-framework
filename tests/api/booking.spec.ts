@@ -1,14 +1,13 @@
 import { test, expect } from '../../fixtures/api';
 import { buildBooking } from '../../utils/bookingData';
 import { env } from '../../config/env';
-
-const bookingShape = {
-  firstname: expect.any(String),
-  lastname: expect.any(String),
-  totalprice: expect.any(Number),
-  depositpaid: expect.any(Boolean),
-  bookingdates: { checkin: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/), checkout: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) },
-};
+import {
+  AuthFailureSchema,
+  AuthTokenSchema,
+  BookingIdListSchema,
+  BookingSchema,
+  CreatedBookingSchema,
+} from '../../api/schemas';
 
 test.describe('Restful-Booker API', () => {
   test('health check responds', { tag: '@smoke' }, async ({ bookingApi }) => {
@@ -22,14 +21,14 @@ test.describe('Restful-Booker API', () => {
       const res = await bookingApi.auth(env.apiUser, env.apiPassword);
 
       expect(res.status()).toBe(200);
-      expect(await res.json()).toEqual({ token: expect.stringMatching(/^\w+$/) });
+      await expect(res).toMatchSchema(AuthTokenSchema);
     });
 
     test('invalid credentials return no token', async ({ bookingApi }) => {
       const res = await bookingApi.auth(env.apiUser, 'wrong-password');
 
       expect(res.status()).toBe(200);
-      expect(await res.json()).toEqual({ reason: 'Bad credentials' });
+      await expect(res).toMatchSchema(AuthFailureSchema);
     });
   });
 
@@ -45,8 +44,8 @@ test.describe('Restful-Booker API', () => {
       expect(res.status()).toBe(200);
       expect(res.headers()['content-type']).toContain('application/json');
 
+      await expect(res).toMatchSchema(CreatedBookingSchema);
       const body = await res.json();
-      expect(body.bookingid).toEqual(expect.any(Number));
       expect(body.booking).toEqual(original);
       id = body.bookingid;
     });
@@ -54,9 +53,8 @@ test.describe('Restful-Booker API', () => {
     await test.step('read back matches what was sent', async () => {
       const res = await bookingApi.get(id);
       expect(res.status()).toBe(200);
-      const body = await res.json();
-      expect(body).toMatchObject(bookingShape);
-      expect(body).toEqual(original);
+      await expect(res).toMatchSchema(BookingSchema);
+      expect(await res.json()).toEqual(original);
     });
 
     const updated = buildBooking();
@@ -64,12 +62,14 @@ test.describe('Restful-Booker API', () => {
     await test.step('full update (PUT)', async () => {
       const res = await bookingApi.update(id, updated, token);
       expect(res.status()).toBe(200);
+      await expect(res).toMatchSchema(BookingSchema);
       expect(await res.json()).toEqual(updated);
     });
 
     await test.step('partial update (PATCH) changes only the given fields', async () => {
       const res = await bookingApi.patch(id, { firstname: 'Patched', totalprice: 111 }, token);
       expect(res.status()).toBe(200);
+      await expect(res).toMatchSchema(BookingSchema);
       expect(await res.json()).toEqual({ ...updated, firstname: 'Patched', totalprice: 111 });
     });
 
@@ -92,6 +92,7 @@ test.describe('Restful-Booker API', () => {
     });
 
     expect(res.status()).toBe(200);
+    await expect(res).toMatchSchema(BookingIdListSchema);
     const ids = (await res.json()).map((b: { bookingid: number }) => b.bookingid);
     expect(ids).toContain(booking.bookingid);
   });

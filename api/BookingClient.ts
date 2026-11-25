@@ -1,23 +1,7 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
+import type { Booking } from './schemas';
 
-export interface BookingDates {
-  checkin: string;
-  checkout: string;
-}
-
-export interface Booking {
-  firstname: string;
-  lastname: string;
-  totalprice: number;
-  depositpaid: boolean;
-  bookingdates: BookingDates;
-  additionalneeds?: string;
-}
-
-export interface CreatedBooking {
-  bookingid: number;
-  booking: Booking;
-}
+export type { Booking, BookingDates, CreatedBooking } from './schemas';
 
 /**
  * Thin, typed wrapper around the Restful-Booker endpoints.
