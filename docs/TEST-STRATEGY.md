@@ -18,6 +18,7 @@ Effort follows business risk: where a defect would cost money or trust, coverage
 | Checkout and price calculation | Wrong charges, lost orders | **High** | Validation table, cancel flows, totals recalculated independently |
 | Authentication and session | Locked-out customers, unauthorised access | **High** | Valid, locked, invalid inputs, auth guard, logout |
 | API authorisation | Data changed by unauthenticated callers | **High** | 403 on PUT, PATCH and DELETE with no, empty or forged tokens, plus side-effect checks |
+| API contract | Consumers break on a renamed, missing or retyped field | Medium | Every response validated against a strict schema; self-tests prove drift is caught |
 | Cart state | Lost items, wrong badge count | Medium | Add/remove, reload persistence, cross-page consistency |
 | Catalogue and sorting | Poor UX, mis-sold items | Medium | All 4 sort orders, list vs details consistency |
 | Accessibility | Excluded users, legal exposure | Medium | WCAG 2.1 AA scan of key pages (report mode) |
@@ -26,7 +27,7 @@ Effort follows business risk: where a defect would cost money or trust, coverage
 
 The rule is **test at the lowest level that can catch the bug**.
 
-- **API tests** (`tests/api`): business rules and authorisation. Fast, stable, no browser.
+- **API tests** (`tests/api`): business rules, authorisation and response contracts. Fast, stable, no browser.
 - **UI tests** (`tests/ui`): behaviour only a user can see: navigation, validation messages, state across pages.
 - **One end-to-end journey**: login → sort → cart → checkout → confirmation, as the critical-path smoke test.
 - **Known-defect tests**: correct behaviour described and marked `test.fail()`, linked to GitHub issues.
@@ -37,6 +38,7 @@ The rule is **test at the lowest level that can catch the bug**.
 - **State transitions:** logged out → logged in → logged out; booking created → updated → patched → deleted → 404.
 - **Oracle independence:** expected sort orders and price totals are *calculated* from page data, never copied from the app.
 - **Negative and security testing:** every write endpoint is checked with no, empty and forged credentials.
+- **Contract testing:** responses must match a strict schema (no missing, extra or retyped fields). The schema checks are themselves tested against deliberately broken payloads, so a too-loose schema can't pass silently.
 
 ## 5. Test data
 
@@ -53,7 +55,7 @@ The rule is **test at the lowest level that can catch the bug**.
 
 - `forbidOnly` and 2 retries in CI, 0 retries locally.
 - Traces on first retry, screenshots and video on failure, HTML report as an artifact.
-- Tags: `@smoke`, `@regression`, `@e2e`, `@security`, `@a11y`, `@known-bug`. Run a tier with `npx playwright test --grep @smoke`.
+- Tags: `@smoke`, `@regression`, `@e2e`, `@security`, `@a11y`, `@known-bug`, `@contract`. Run a tier with `npx playwright test --grep @smoke`.
 
 ## 7. Flakiness policy
 

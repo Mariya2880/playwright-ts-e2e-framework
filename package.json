@@ -9,6 +9,7 @@
     "test": "playwright test",
     "test:smoke": "playwright test --grep @smoke",
     "test:regression": "playwright test --grep @regression",
+    "test:contract": "playwright test --grep @contract",
     "test:headed": "playwright test --headed",
     "report": "playwright show-report",
     "lint": "eslint .",
@@ -24,7 +25,8 @@
     "eslint": "^9.17.0",
     "eslint-plugin-playwright": "^2.1.0",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.18.0"
+    "typescript-eslint": "^8.18.0",
+    "zod": "^4.6.7"
   },
   "engines": {
     "node": ">=20"
